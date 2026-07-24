@@ -6,16 +6,16 @@ Multiple `401` or `403` responses to an authentication path from the same source
 
 ## Triage steps
 
-1. Confirm the affected authentication endpoint and the event time window.
-2. Review the alert evidence for account identifiers or user-agent data in the original approved log source, if available.
-3. Check whether a successful login from the same source occurred after the failures.
-4. Look for the source IP in other web, identity, or firewall telemetry.
-5. Document the decision and escalate according to the organization's incident process.
+1. Check the login endpoint and the time of the requests.
+2. If the original log has them, review the username and user-agent.
+3. Check if the same IP logged in successfully after the failed attempts.
+4. Search the IP in firewall or application logs.
+5. Save the result and escalate it if necessary.
 
 ## Containment considerations
 
-Apply rate limiting, MFA, CAPTCHA, or a temporary block only after validating the activity and considering legitimate users behind shared networks.
+After confirming the activity, consider rate limiting, MFA, CAPTCHA, or a temporary block. Keep in mind that an IP can belong to a shared network.
 
 ## False-positive notes
 
-Password-manager retries, application health checks, and users with stale credentials can produce similar events.
+Password-manager retries, health checks, and old passwords can look like failed login attempts.

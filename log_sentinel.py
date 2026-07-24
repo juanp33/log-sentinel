@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A local, transparent SIEM-style lab for Apache access logs."""
+"""Read Apache access logs and generate basic security alerts."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ class Alert:
 
 
 def parse_log(line: str) -> Event | None:
-    """Parse one Apache Combined Log Format line, returning None when invalid."""
+    """Return an event for a valid Apache log line."""
     match = LOG_PATTERN.match(line)
     if not match:
         return None
@@ -89,7 +89,7 @@ def _alert(rule_id: str, source_ip: str, events: list[Event], evidence: list[str
 
 
 def detect(lines: list[str], threshold: int = 5) -> list[Alert]:
-    """Correlate local web events into explainable, SIEM-style alerts."""
+    """Run the detection rules against the supplied log lines."""
     failed_auth: dict[str, list[Event]] = defaultdict(list)
     probes: dict[str, list[Event]] = defaultdict(list)
 
@@ -114,7 +114,7 @@ def detect(lines: list[str], threshold: int = 5) -> list[Alert]:
 
 
 def summarize(alerts: list[Alert]) -> dict[str, object]:
-    """Produce a dashboard-friendly alert summary without exposing raw logs."""
+    """Return the values used in the summary output."""
     by_severity = Counter(alert.severity for alert in alerts)
     by_rule = Counter(alert.rule for alert in alerts)
     sources = sorted({alert.source_ip for alert in alerts})
