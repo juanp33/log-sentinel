@@ -54,9 +54,9 @@ Apache access log -> parser -> correlation rules -> enriched alerts -> investiga
 
 The included sample data uses documentation IP ranges. Do not commit production access logs or credentials. See the two investigation examples in [`docs/investigations`](docs/investigations).
 
-## Scope and safety
+## Notes
 
-This is a defensive, local-only educational lab. It does not scan targets, execute remediation, or transmit telemetry. Treat real IP addresses and logs as operationally sensitive.
+This project only reads a log file. It does not scan websites, block IPs, or send data anywhere. Real logs and IP addresses should be handled carefully.
 
 ## License
 
