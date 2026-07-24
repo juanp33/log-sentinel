@@ -1,32 +1,62 @@
 # Log Sentinel
 
-`log-sentinel` is a compact detection-engineering project that parses Apache-style access logs and flags two useful security signals:
+Log Sentinel is a **local, SIEM-style detection engineering lab** for Apache access logs. It ingests a log file, correlates events into alerts, maps detections to MITRE ATT&CK, and emits analyst-ready evidence and next steps.
 
-- Repeated failed authentication attempts from the same IP address.
-- Requests to paths commonly probed by opportunistic scanners.
+It is intentionally small and dependency-free: the purpose is to show the detection lifecycle clearly, not to replace a production SIEM.
 
-It is deliberately transparent: detections are rules in plain Python and results can be exported as JSON for a SIEM or dashboard prototype.
+## What it demonstrates
+
+- Local log ingestion with no network transmission.
+- Rule-based correlation by source IP.
+- Alert enrichment: severity, rule ID, MITRE technique, evidence, time range, and remediation advice.
+- SIEM-friendly JSON and JSON Lines output.
+- A dashboard-ready summary and documented investigation playbooks.
+
+## Detection rules
+
+| ID | Detection | Severity | MITRE ATT&CK |
+| --- | --- | --- | --- |
+| LS-001 | Repeated failed authentication attempts | High | T1110 – Brute Force |
+| LS-002 | Requests to sensitive or commonly probed paths | Medium | T1595 – Active Scanning |
 
 ## Quick start
 
-Requires Python 3.10+ and no third-party dependencies.
+Requires Python 3.10+ and no third-party packages.
 
 ```bash
+# Analyst-oriented alert output
 python log_sentinel.py sample.log --threshold 3
-python log_sentinel.py sample.log --format json > alerts.json
+
+# Alerts ready for a dashboard or another local tool
+python log_sentinel.py sample.log --threshold 3 --format json
+python log_sentinel.py sample.log --threshold 3 --format jsonl
+
+# Compact dashboard-style view
+python log_sentinel.py sample.log --threshold 3 --summary
+
+# Verify the detection rules
 python -m unittest discover -s tests -v
 ```
 
 ## Example alert
 
 ```text
-[HIGH] brute_force 203.0.113.10: 3 failed authentication requests in the log window
-[MEDIUM] suspicious_probe 198.51.100.7: Requested sensitive/probed path: /.env
+[HIGH] LS-001 brute_force | 203.0.113.10 | 3 event(s) | T1110 - Brute Force
+  Evidence: POST /login -> 401; POST /login -> 401; POST /login -> 403
+  Next step: Validate the source IP and consider rate-limiting or blocking it.
 ```
 
-## Notes
+## Lab workflow
 
-The parser supports the Apache Combined Log Format. Treat IP addresses and logs as sensitive operational data; this tool processes files locally and never sends them anywhere.
+```text
+Apache access log -> parser -> correlation rules -> enriched alerts -> investigation playbook
+```
+
+The included sample data uses documentation IP ranges. Do not commit production access logs or credentials. See the two investigation examples in [`docs/investigations`](docs/investigations).
+
+## Scope and safety
+
+This is a defensive, local-only educational lab. It does not scan targets, execute remediation, or transmit telemetry. Treat real IP addresses and logs as operationally sensitive.
 
 ## License
 
